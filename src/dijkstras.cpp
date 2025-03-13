@@ -42,8 +42,8 @@ vector<int> extract_shortest_path(const vector<int>&, const vector<int>& previou
 
 void print_path(const vector<int>& v, int total) {
     for (int i = 0; i < (int)v.size(); i++) {
-        cout << v[i] << endl;
-        if (i < (int)v.size() - 1) cout << endl;
+        cout << v[i];
+        if (i < (int)v.size() - 1) cout << " ";
     }
-    cout << " total: " << total << endl;
+    cout << endl << "Total cost is " << total << endl;
 }
