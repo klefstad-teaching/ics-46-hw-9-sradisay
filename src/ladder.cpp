@@ -8,27 +8,30 @@ void error(string word1, string word2, string msg) {
     cerr << msg << " " << word1 << " " << word2 << endl;
 }
 
+static int get_length_diff(const string& a, const string& b)
+{
+    return abs((int)a.size() - (int)b.size());
+}
+
+
 static bool edit_distance_at_most_one(const string& a, const string& b) {
-    if (abs((int)a.size() - (int)b.size()) > 1) return false;
-    int i = 0, j = 0, diff = 0;
-    while (i < (int)a.size() && j < (int)b.size()) {
-        if (a[i] != b[j]) {
-            diff++;
-            if (diff > 1) return false;
-            if (a.size() > b.size()) i++;
-            else if (b.size() > a.size()) j++;
-            else { i++; j++; }
-        } else {
-            i++;
-            j++;
-        }
-    }
-    if (i < (int)a.size() || j < (int)b.size()) diff++;
+    int length_diff = get_length_diff(a, b);
+    if (length_diff > 1) return false;
+
+    int diff = length_diff;
+    int shorter_size = a.size();
+    if (b.size() < shorter_size)
+        shorter_size = b.size();
+
+    for (int i = 0; i < shorter_size; ++i)
+        if (a[i] != b[i])
+            ++diff;
+    
+    
     return diff <= 1;
 }
 
 bool edit_distance_within(const string& s1, const string& s2, int d) {
-    if (s1.size() != s2.size()) return false;
     return edit_distance_at_most_one(s1, s2);
 }
 
@@ -66,17 +69,14 @@ void load_words(set<string>& word_list, const string& file_name) {
 
 void print_word_ladder(const vector<string>& ladder) {
     if (ladder.empty()) {
-        error("", "", "No word ladder found.\n");
+        cout << "No word ladder found." << endl;
         return;
     }
 
     cout << "Word ladder found: ";
-    for (int i = 0; i < (int)ladder.size(); i++) {
-        cout << ladder[i];
-        if (i < (int)ladder.size() - 1) cout << " ";
-    }
+    for (int i = 0; i < (int)ladder.size(); i++) 
+        cout << ladder[i] << " ";
     cout << endl;
-    
 }
 
 void verify_word_ladder() {
