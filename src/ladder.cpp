@@ -89,7 +89,7 @@ vector<string> generate_word_ladder(const string &begin_word, const string &end_
 void load_words(set<string>& word_list, const string& file_name) {
     ifstream file(file_name);
     string w;
-    while (file >> w) {word_list.insert(w);}
+    while (file >> w) word_list.insert(w);
 }
 
 void print_word_ladder(const vector<string>& ladder) {
@@ -107,6 +107,7 @@ void print_word_ladder(const vector<string>& ladder) {
 void verify_word_ladder() {
     set<string> word_list;
     load_words(word_list, "../src/words.txt");
+
     my_assert(generate_word_ladder("cat", "dog", word_list).size() == 4);
 
     my_assert(generate_word_ladder("marty", "curls", word_list).size() == 6);

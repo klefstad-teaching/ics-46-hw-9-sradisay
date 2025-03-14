@@ -39,7 +39,7 @@ TEST(Dijkstra, Test) {
 
 TEST(Dijkstra, TestSmall) {
     Graph G;
-    file_to_graph("../src/small.txt", G);
+    file_to_graph("../src/large.txt", G);
     vector<int> previous(G.numVertices, -1);
     auto dist = dijkstra_shortest_path(G, 0, previous);
     auto path = extract_shortest_path(dist, previous, 3);
