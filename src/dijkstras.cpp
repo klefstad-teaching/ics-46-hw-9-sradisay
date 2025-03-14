@@ -33,10 +33,15 @@ vector<int> extract_shortest_path(const vector<int>& distances, const vector<int
         return path;
     }
 
-    while (destination != -1) {
+    while (destination != -1 && distances[destination] != 0) {
         path.push_back(destination);
         destination = previous[destination];
     }
+
+    if (destination != -1) 
+        path.push_back(destination);
+    
+
     reverse(path.begin(), path.end());
     return path;
 }
