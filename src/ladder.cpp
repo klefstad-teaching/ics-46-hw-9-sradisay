@@ -1,4 +1,5 @@
 #include "ladder.h"
+#include <unordered_map>
 
 #define my_assert(e) {cout << #e << ((e) ? " passed": " failed") << endl;}
 //
@@ -8,59 +9,83 @@ void error(string word1, string word2, string msg) {
     cerr << msg << " " << word1 << " " << word2 << endl;
 }
 
-static int get_length_diff(const string& a, const string& b)
-{
-    return abs((int)a.size() - (int)b.size());
-}
-
-
-static bool edit_distance_at_most_one(const string& a, const string& b) {
-    int length_diff = get_length_diff(a, b);
-    if (length_diff > 1) return false;
-
-    int diff = length_diff;
-    int shorter_size = a.size();
-    if (b.size() < shorter_size)
-        shorter_size = b.size();
-
-    for (int i = 0; i < shorter_size; ++i)
-        if (a[i] != b[i])
-            ++diff;
-    
-    
-    return diff <= 1;
-}
-
 bool edit_distance_within(const string& s1, const string& s2, int d) {
-    return edit_distance_at_most_one(s1, s2);
+    int s1_size = s1.size(), s2_size = s2.size();
+    if (abs(s1_size - s2_size) > d) return false;
+    
+    vector<int> prev(s2_size + 1), curr(s2_size + 1);
+    
+    for (int j = 0; j <= s2_size; j++) {
+        prev[j] = j;
+    }
+    
+    for (int i = 1; i <= s1_size; i++) {
+        curr[0] = i;  
+        int rowMin = curr[0];
+        
+        for (int j = 1; j <= s2_size; j++) {
+            if (s1[i - 1] == s2[j - 1])
+                curr[j] = prev[j - 1];
+            else
+                curr[j] = 1 + min({ prev[j],      
+                                    curr[j - 1], 
+                                    prev[j - 1] });
+            
+            rowMin = min(rowMin, curr[j]);
+        }
+        
+        if (rowMin > d)
+            return false;
+        
+        prev.swap(curr);
+    }
+    
+    return prev[s2_size] <= d;
 }
 
 bool is_adjacent(const string& word1, const string& word2) {
     return edit_distance_within(word1, word2, 1);
 }
 
-vector<string> generate_word_ladder(const string& begin_word, const string& end_word, const set<string>& word_list) {
-    if (begin_word == end_word) return {};
-    queue<vector<string>> paths;
+vector<string> generate_word_ladder(const string &begin_word, const string &end_word, const set<string> &word_list)
+{
+    queue<vector<string>> ladder_queue;
+    
+    ladder_queue.push({begin_word});
+    
     set<string> visited;
-    paths.push({begin_word});
     visited.insert(begin_word);
-    while (!paths.empty()) {
-        auto path = paths.front();
-        paths.pop();
-        if (path.back() == end_word) return path;
-        for (auto &w : word_list) {
-            if (!visited.count(w) && is_adjacent(path.back(), w)) {
-                visited.insert(w);
-                auto new_path = path;
-                new_path.push_back(w);
-                paths.push(new_path);
+    
+    while (!ladder_queue.empty())
+    {
+        vector<string> ladder = ladder_queue.front();
+        ladder_queue.pop();
+        
+        string last_word = ladder.back();
+        
+        for (const string &word : word_list)
+        {
+            if (is_adjacent(last_word, word))
+            {
+                if (visited.find(word) == visited.end())
+                {
+                    visited.insert(word);
+                    
+                    vector<string> new_ladder(ladder);
+                    new_ladder.push_back(word);
+                    
+                    if (word == end_word)
+                    {
+                        return new_ladder;
+                    }
+                    
+                    ladder_queue.push(new_ladder);
+                }
             }
         }
     }
-    return {};
+    return vector<string>();
 }
-
 void load_words(set<string>& word_list, const string& file_name) {
     ifstream file(file_name);
     string w;
